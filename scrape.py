@@ -1,5 +1,6 @@
 import tweepy
 from decouple import config
+import json
 
 bearer_token = config('bearerToken',default='')
 consumer_key = config('consumer_key',default='')
@@ -27,11 +28,11 @@ def getUserInfo(username):
   user = client.get_user(username=username)
   return user.data.id
 
-def getTweets():
+def getTweets(tag):
   api = getAPIV1()
-  tweet_cursor = tweepy.Cursor(api.search_tweets, q= 'nft', lang="en", tweet_mode="extended").items(100)
+  tweet_cursor = tweepy.Cursor(api.search_tweets, q=tag, lang="en", tweet_mode="extended").items(100)
   # tweets = [tweet.full_text for tweet in tweet_cursor]
-  tweets = [tweet for tweet in tweet_cursor]
+  tweets = [tweet._json for tweet in tweet_cursor]
   return tweets
 
 def getFollowers():
@@ -45,7 +46,13 @@ def getMe():
   me = api.get_followers()
   return me
 
-# tweets = getTweets()
-# print(tweets)
-followers = getFollowers()
-print(followers)
+tweets = getTweets('nft')
+# json_object = json.loads(tweets[0]._json)
+# json_formatted_str = json.dumps(json_object, indent=2)
+# print(json_formatted_str)
+# print(tweets[0])
+for i in range(len(tweets)):
+  print(i, " ", tweets[i]['user'], '\n')
+
+# followers = getFollowers()
+# print(followers)
