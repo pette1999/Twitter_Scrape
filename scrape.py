@@ -1,6 +1,8 @@
 import tweepy
 from decouple import config
 import json
+import csv
+import helper
 
 bearer_token = config('bearerToken',default='')
 consumer_key = config('consumer_key',default='')
@@ -46,13 +48,24 @@ def getMe():
   me = api.get_followers()
   return me
 
-tweets = getTweets('nft')
+# tweets = getTweets('nft')
 # json_object = json.loads(tweets[0]._json)
 # json_formatted_str = json.dumps(json_object, indent=2)
 # print(json_formatted_str)
 # print(tweets[0])
-for i in range(len(tweets)):
-  print(i, " ", tweets[i]['user'], '\n')
+# for i in range(len(tweets)):
+#   print(i, " ", tweets[i]['user']['id'], '\n')
 
-# followers = getFollowers()
-# print(followers)
+def getRecentTweeter(topic, filename):
+  people = getTweets(topic)
+  for i in range(len(people)):
+    person = people[i]['user']
+    data = [person['id'], person['name'],
+            person['screen_name'], person['location'], person['description'], person['followers_count'], person['friends_count'], person['listed_count'], person['created_at'], person['favourites_count'], person['time_zone'], person['verified'], person['statuses_count'], person['lang'], person['following'], person['follow_request_sent']]
+    # check if this person is already in the database
+    idList = helper.readCol(filename, 'id')
+    if str(person['id']) not in idList:
+      helper.writeToFile(filename, data)
+
+
+getRecentTweeter('nft', './data/people.csv')
