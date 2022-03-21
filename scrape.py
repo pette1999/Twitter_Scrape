@@ -57,10 +57,48 @@ def getFollowers_by_username(username):
     i += 1
     # follower.append(user._json)
 
-def getFollowers_by_id(userID):
+def getFollowing_by_id(filename, username):
   api = getAPIV1()
+  users = tweepy.Cursor(
+      api.get_friend_ids, screen_name=username, count=5000).items()
+  # read in what we have in file
+  ids = helper.readCol(filename, 'id')
+  status = helper.readCol(filename, 'status')
+  while True:
+    try:
+      user = next(users)
+    except tweepy.errors.TweepyException:
+      time.sleep(60*15)
+      user = next(users)
+    except StopIteration:
+      break
+    # check if we already have the person in our list
+    if str(user) not in ids:
+      helper.writeToFile(filename, [str(user),True])
+    if str(user) in ids and status[ids.index(str(user))] == 'False':
+      # the user approved out following request
+      helper.editFile('./data/following.csv', str(user), [str(user), True])
 
+def getOutgoing_friendship(filename):
+  api = getAPIV1()
+  users = tweepy.Cursor(
+      api.outgoing_friendships).items(5000)
+  # read in what we have in file
+  ids = helper.readCol(filename, 'id')
+  while True:
+    try:
+      user = next(users)
+    except tweepy.errors.TweepyException:
+      time.sleep(60*15)
+      user = next(users)
+    except StopIteration:
+      break
+    # check if we already have the person in our list
+    if str(user) not in ids:
+      helper.writeToFile(filename, [str(user), False])
 
+getFollowing_by_id('./data/following.csv', 'chen_haifan')
+# getOutgoing_friendship('./data/following.csv')
 # tweets = getTweets('nft')
 # json_object = json.loads(tweets[0]._json)
 # json_formatted_str = json.dumps(json_object, indent=2)
@@ -121,4 +159,4 @@ def followAndHello(filename):
 # followUser('1504696465918111744')
 # print(getUserInfo('ChenHaifan3'))
 # getRecentTweeter('nft','./data/people.csv')
-print(getFollowers_by_username('rmaxb96'))
+# print(getFollowers_by_username('rmaxb96'))
