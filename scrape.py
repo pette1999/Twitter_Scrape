@@ -66,10 +66,12 @@ def getFollowingIDs(filename, username):
   # read in what we have in file
   ids = helper.readCol(filename, 'id')
   status = helper.readCol(filename, 'status')
+  blacklist = helper.readCol('./data/blacklist.csv', 'id')
   # if id is in ids but not in users, it means we unfollowed him, move to blacklist
-  usersStr = list(map(str, users))
+  # usersStr = [str(item) for item in users]
+  # requestsStr = list(map(str, requests))
   for i in ids:
-    if len(i)>0 and i not in usersStr:
+    if len(i) > 0 and int(i) not in users and int(i) not in requests:
       # write the id to blacklist
       helper.writeToFile('./data/blacklist.csv', [i])
       # remove the id from following
@@ -168,14 +170,17 @@ def sendDirectMessage(userID, message):
   except Exception as e:
     print(e)
 
-def followAndHello(filename):
+def followAndHello(filename, myUsername):
+  final_target_ids = []
   # run through the targeting people list and get all there ids
   idList = helper.readCol('./data/people.csv', 'id')
-  # run through the current following list
-
-  # check if already followed these people
-
-  # check if already sent a follow request
+  # run through the current following list, # check if already sent a follow request, check if already followed these people, check if in the blacklist
+  getFollowingIDs(filename, myUsername)
+  following = helper.readCol('./data/following.csv', 'id')
+  blacklist = helper.readCol('./data/blacklist.csv', 'id')
+  for i in idList:
+    if i not in following and i not in blacklist:
+      final_target_ids.append(i)
   # follow these people
   # send direct message to these people
   # follow every 30 seconds
