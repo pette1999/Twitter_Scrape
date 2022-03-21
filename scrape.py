@@ -114,6 +114,22 @@ def getFollowingIDs(filename, username):
     if str(request) not in ids:
       helper.writeToFile(filename, [str(request), False])
 
+def getFollowerIDs(followerFilename, username):
+  api = getAPIV1()
+  followers = tweepy.Cursor(
+      api.get_follower_ids, screen_name=username, count=5000).items()
+  followerIDs = helper.readCol(followerFilename, 'id')
+  while True:
+    try:
+      follower = next(followers)
+    except tweepy.errors.TweepyException:
+      time.sleep(60*15)
+      follower = next(followers)
+    except StopIteration:
+      break
+    # check if we already have the person in our list
+    if str(follower) not in followerIDs:
+      helper.writeToFile(followerFilename, [str(follower)])
 
 def getOutgoing_friendship(filename):
   api = getAPIV1()
@@ -195,4 +211,9 @@ def followAndHello(filename, myUsername):
   # clear the people.csv file
   helper.clearFile('./data/people.csv', ['id', 'name', 'username', 'location', 'description', 'followers_count', 'friends_count', 'listed_count', 'date_joined', 'favourites_count', 'time_zone', 'verified', 'statuses_count', 'language', 'current_following', 'follow_request_sent'])
 
-followAndHello('./data/following.csv', 'chen_haifan')
+def check():
+  pass
+
+
+# followAndHello('./data/following.csv', 'chen_haifan')
+getFollowerIDs('./data/follower.csv', 'chen_haifan')
