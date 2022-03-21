@@ -2,6 +2,7 @@
 import csv
 from tempfile import NamedTemporaryFile
 import shutil
+import os
 
 def createCSV(filename, header):
   with open(filename, 'w', encoding='UTF8', newline='') as f:
@@ -36,6 +37,9 @@ def deleteLine(filename, dataChange):
   shutil.move(tempfile.name, filename)
 
 
+def clearFile(filename, header):
+  os.remove(filename)
+  createCSV(filename, header)
   
 def readCol(filename, colName):
   id = []

@@ -191,7 +191,8 @@ def followAndHello(filename, myUsername):
       # send direct message to these people
       sendDirectMessage(j, "Hello")
   # the limit is 50 people/15 min
-
-
+  getFollowingIDs(filename, myUsername)
+  # clear the people.csv file
+  helper.clearFile('./data/people.csv', ['id', 'name', 'username', 'location', 'description', 'followers_count', 'friends_count', 'listed_count', 'date_joined', 'favourites_count', 'time_zone', 'verified', 'statuses_count', 'language', 'current_following', 'follow_request_sent'])
 
 followAndHello('./data/following.csv', 'chen_haifan')
