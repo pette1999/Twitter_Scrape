@@ -4,6 +4,7 @@ import json
 import csv
 import helper
 import time
+from datetime import date
 
 bearer_token = config('bearerToken',default='')
 consumer_key = config('consumer_key',default='')
@@ -28,9 +29,11 @@ def getClientV2():
   return client
 
 def getUserInfo(username):
-  client = getClientV2()
-  user = client.get_user(username=username)
-  return user.data.id
+  #client = getClientV2()
+  api = getAPIV1()
+  #user = client.get_user(username=username)
+  user2 = api.get_user(screen_name=username)
+  return user2._json
 
 def getTweets(tag):
   api = getAPIV1()
@@ -57,6 +60,21 @@ def getFollowers_by_username(username):
     i += 1
     # follower.append(user._json)
 
+def writeToBlacklist(filename, username):
+  api = getAPIV1()
+  users = tweepy.Cursor(
+      api.get_friend_ids, screen_name=username, count=5000).items()
+  requests = tweepy.Cursor(
+      api.outgoing_friendships).items(5000)
+  ids = helper.readCol(filename, 'id')
+  for i in ids:
+    if len(i) > 0 and int(i) not in users and int(i) not in requests:
+      # write the id to blacklist
+      helper.writeToFile('./data/blacklist.csv', [i])
+      # remove the id from following
+      helper.deleteLine('./data/following.csv', i)
+      print(i)
+
 def getFollowingIDs(filename, username):
   api = getAPIV1()
   users = tweepy.Cursor(
@@ -68,16 +86,7 @@ def getFollowingIDs(filename, username):
   status = helper.readCol(filename, 'status')
   blacklist = helper.readCol('./data/blacklist.csv', 'id')
   # if id is in ids but not in users, it means we unfollowed him, move to blacklist
-  # usersStr = [str(item) for item in users]
-  # requestsStr = list(map(str, requests))
-  for i in ids:
-    if len(i) > 0 and int(i) not in users and int(i) not in requests:
-      # write the id to blacklist
-      helper.writeToFile('./data/blacklist.csv', [i])
-      # remove the id from following
-      helper.deleteLine('./data/following.csv', i)
-      print(i)
-
+  writeToBlacklist(filename, username)
   while True:
     try:
       user = next(users)
@@ -86,6 +95,7 @@ def getFollowingIDs(filename, username):
       user = next(users)
     except StopIteration:
       break
+    print(str(user))
     # check if we already have the person in our list
     if str(user) not in ids:
       helper.writeToFile(filename, [str(user),True])
@@ -103,6 +113,7 @@ def getFollowingIDs(filename, username):
     # check if we already have the person in our list
     if str(request) not in ids:
       helper.writeToFile(filename, [str(request), False])
+
 
 def getOutgoing_friendship(filename):
   api = getAPIV1()
@@ -122,16 +133,6 @@ def getOutgoing_friendship(filename):
     if str(user) not in ids:
       helper.writeToFile(filename, [str(user), False])
 
-
-getFollowingIDs('./data/following.csv', 'chen_haifan')
-# getOutgoing_friendship('./data/following.csv')
-# tweets = getTweets('nft')
-# json_object = json.loads(tweets[0]._json)
-# json_formatted_str = json.dumps(json_object, indent=2)
-# print(json_formatted_str)
-# print(tweets[0])
-# for i in range(len(tweets)):
-#   print(i, " ", tweets[i]['user']['id'], '\n')
 
 def getRecentTweeter(topic, filename):
   people = getTweets(topic)
@@ -178,16 +179,19 @@ def followAndHello(filename, myUsername):
   getFollowingIDs(filename, myUsername)
   following = helper.readCol('./data/following.csv', 'id')
   blacklist = helper.readCol('./data/blacklist.csv', 'id')
+  sentFollow = helper.readCol('./data/sentFollow.csv', 'id')
   for i in idList:
     if i not in following and i not in blacklist:
       final_target_ids.append(i)
-  # follow these people
-  # send direct message to these people
-  # follow every 30 seconds
+  for j in final_target_ids:
+    # follow these people
+    if j not in sentFollow:
+      followUser(j)
+      helper.writeToFile('./data/sentFollow.csv', [j, date.today().strftime("%m/%d/%y")])
+      # send direct message to these people
+      sendDirectMessage(j, "Hello")
+  # the limit is 50 people/15 min
 
 
-# sendDirectMessage('1504937972453371908', "hello Peter!")
-# followUser('1504696465918111744')
-# print(getUserInfo('ChenHaifan3'))
-# getRecentTweeter('nft','./data/people.csv')
-# print(getFollowers_by_username('rmaxb96'))
+
+followAndHello('./data/following.csv', 'chen_haifan')

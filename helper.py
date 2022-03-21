@@ -34,6 +34,8 @@ def deleteLine(filename, dataChange):
       if row[0] != dataChange:
         writer.writerow(row)
   shutil.move(tempfile.name, filename)
+
+
   
 def readCol(filename, colName):
   id = []
