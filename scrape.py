@@ -67,7 +67,15 @@ def getFollowingIDs(filename, username):
   ids = helper.readCol(filename, 'id')
   status = helper.readCol(filename, 'status')
   # if id is in ids but not in users, it means we unfollowed him, move to blacklist
-  
+  usersStr = list(map(str, users))
+  for i in ids:
+    if len(i)>0 and i not in usersStr:
+      # write the id to blacklist
+      helper.writeToFile('./data/blacklist.csv', [i])
+      # remove the id from following
+      helper.deleteLine('./data/following.csv', i)
+      print(i)
+
   while True:
     try:
       user = next(users)
@@ -76,7 +84,6 @@ def getFollowingIDs(filename, username):
       user = next(users)
     except StopIteration:
       break
-    print(str(user))
     # check if we already have the person in our list
     if str(user) not in ids:
       helper.writeToFile(filename, [str(user),True])
