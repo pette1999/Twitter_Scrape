@@ -57,13 +57,17 @@ def getFollowers_by_username(username):
     i += 1
     # follower.append(user._json)
 
-def getFollowing_by_id(filename, username):
+def getFollowingIDs(filename, username):
   api = getAPIV1()
   users = tweepy.Cursor(
       api.get_friend_ids, screen_name=username, count=5000).items()
+  requests = tweepy.Cursor(
+      api.outgoing_friendships).items(5000)
   # read in what we have in file
   ids = helper.readCol(filename, 'id')
   status = helper.readCol(filename, 'status')
+  # if id is in ids but not in users, it means we unfollowed him, move to blacklist
+  
   while True:
     try:
       user = next(users)
@@ -72,12 +76,24 @@ def getFollowing_by_id(filename, username):
       user = next(users)
     except StopIteration:
       break
+    print(str(user))
     # check if we already have the person in our list
     if str(user) not in ids:
       helper.writeToFile(filename, [str(user),True])
     if str(user) in ids and status[ids.index(str(user))] == 'False':
       # the user approved out following request
       helper.editFile('./data/following.csv', str(user), [str(user), True])
+  while True:
+    try:
+      request = next(requests)
+    except tweepy.errors.TweepyException:
+      time.sleep(60*15)
+      request = next(requests)
+    except StopIteration:
+      break
+    # check if we already have the person in our list
+    if str(request) not in ids:
+      helper.writeToFile(filename, [str(request), False])
 
 def getOutgoing_friendship(filename):
   api = getAPIV1()
@@ -97,7 +113,8 @@ def getOutgoing_friendship(filename):
     if str(user) not in ids:
       helper.writeToFile(filename, [str(user), False])
 
-getFollowing_by_id('./data/following.csv', 'chen_haifan')
+
+getFollowingIDs('./data/following.csv', 'chen_haifan')
 # getOutgoing_friendship('./data/following.csv')
 # tweets = getTweets('nft')
 # json_object = json.loads(tweets[0]._json)
@@ -145,8 +162,10 @@ def sendDirectMessage(userID, message):
     print(e)
 
 def followAndHello(filename):
-  # run through the list and get all there ids
-  idList = helper.readCol(filename, 'id')
+  # run through the targeting people list and get all there ids
+  idList = helper.readCol('./data/people.csv', 'id')
+  # run through the current following list
+
   # check if already followed these people
 
   # check if already sent a follow request

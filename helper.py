@@ -22,7 +22,8 @@ def editFile(filename, dataChange, newData):
     for row in reader:
       if row[0] == dataChange:
         row = newData
-      writer.writerow(row)
+      if newData != []:
+        writer.writerow(row)
   shutil.move(tempfile.name, filename)
   
 def readCol(filename, colName):
