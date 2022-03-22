@@ -220,7 +220,7 @@ def check():
   # pull the account followers to file
   getFollowerIDs('./data/follower.csv', 'chen_haifan')
   # filter out all the people in the `sentFollow.csv` that have past the time LIMIT(7 days)
-
+  
     
 
 followAndHello('./data/following.csv', 'chen_haifan')
