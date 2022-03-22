@@ -72,8 +72,7 @@ def writeToBlacklist(filename, username):
   if len(ids) >  0:
     for i in ids:
       if len(i) > 0 and int(i) not in list(users2) and int(i) not in list(requests2):
-        print(type(int(i)), int(i) not in list(
-            users2), int(i) not in list(requests2))
+        print(type(int(i)), int(i) not in list(users2), int(i) not in list(requests2))
         # write the id to blacklist
         helper.writeToFile('./data/blacklist.csv', [i])
         # remove the id from following
@@ -152,7 +151,6 @@ def getOutgoing_friendship(filename):
     if str(user) not in ids:
       helper.writeToFile(filename, [str(user), False])
 
-
 def getRecentTweeter(topic, filename):
   people = getTweets(topic)
   for i in range(len(people)):
@@ -170,6 +168,10 @@ def getRecentTweeter(topic, filename):
 def followUser(userID):
   client = getClientV2()
   client.follow_user(target_user_id=userID)
+
+def unFollowUser(userID):
+  client = getClientV2()
+  client.unfollow_user(target_user_id=userID)
 
 def sendDirectMessage(userID, message):
   api = getAPIV1()
@@ -215,14 +217,37 @@ def followAndHello(filename, myUsername):
   # the limit is 50 people/15 min
   # clear the people.csv file
   helper.clearFile('./data/people.csv', ['id', 'name', 'username', 'location', 'description', 'followers_count', 'friends_count', 'listed_count', 'date_joined', 'favourites_count', 'time_zone', 'verified', 'statuses_count', 'language', 'current_following', 'follow_request_sent'])
+  time.sleep(2)
+  getFollowingIDs(filename, myUsername)
 
 def check():
   # pull the account followers to file
   getFollowerIDs('./data/follower.csv', 'chen_haifan')
+  followerIDs = helper.readCol('./data/follower.csv', 'id')
   # filter out all the people in the `sentFollow.csv` that have past the time LIMIT(7 days)
-  
-    
+  filteredIDs = [] # users that needed to be checked if they followed or not
+  d = helper.convertDate_to_days(date.today().strftime("%m/%d/%y"))
+  sendFollowIDs = helper.readCol('./data/sentFollow.csv', 'id')
+  sendFollowDates = helper.readCol('./data/sentFollow.csv', 'date')
+  for i in sendFollowDates:
+    if int(i) < int(d)-7:
+      filteredIDs.append(sendFollowIDs[sendFollowDates.index(i)])
+  # check each id in the filteredIDs list and see if it's in the followerIDs list
+  # if yes, then the user followed back, if not, the user didn't follow back and we need to unfollow this user as well
+  for j in filteredIDs:
+    if j in followerIDs:
+      # the user followed back
+      pass
+    else:
+      # the person didn't follow back
+      # unfollow this person
+      unFollowUser(j)
+      helper.deleteLine('./data/following.csv', j)
+      helper.writeToFile('./data/blacklist.csv', [j])
+
+    helper.deleteLine('./data/sentFollow.csv', j)
+
 
 followAndHello('./data/following.csv', 'chen_haifan')
 # print(helper.convertDate_to_days('1/31/22'))
-      
+# check()
