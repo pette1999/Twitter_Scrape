@@ -248,6 +248,6 @@ def check():
     helper.deleteLine('./data/sentFollow.csv', j)
 
 
-followAndHello('./data/following.csv', 'chen_haifan')
+# followAndHello('./data/following.csv', 'chen_haifan')
 # print(helper.convertDate_to_days('1/31/22'))
 # check()

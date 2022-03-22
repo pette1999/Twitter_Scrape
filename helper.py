@@ -36,7 +36,6 @@ def deleteLine(filename, dataChange):
         writer.writerow(row)
   shutil.move(tempfile.name, filename)
 
-
 def clearFile(filename, header):
   os.remove(filename)
   createCSV(filename, header)
