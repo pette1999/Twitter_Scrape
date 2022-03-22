@@ -67,13 +67,17 @@ def writeToBlacklist(filename, username):
   requests = tweepy.Cursor(
       api.outgoing_friendships).items(5000)
   ids = helper.readCol(filename, 'id')
-  for i in ids:
-    if len(i) > 0 and int(i) not in users and int(i) not in requests:
-      # write the id to blacklist
-      helper.writeToFile('./data/blacklist.csv', [i])
-      # remove the id from following
-      helper.deleteLine('./data/following.csv', i)
-      print(i)
+  users2 = list(users).copy()
+  requests2 = list(requests).copy()
+  if len(ids) >  0:
+    for i in ids:
+      if len(i) > 0 and int(i) not in list(users2) and int(i) not in list(requests2):
+        print(type(int(i)), int(i) not in list(
+            users2), int(i) not in list(requests2))
+        # write the id to blacklist
+        helper.writeToFile('./data/blacklist.csv', [i])
+        # remove the id from following
+        helper.deleteLine('./data/following.csv', i)
 
 def getFollowingIDs(filename, username):
   api = getAPIV1()
@@ -95,7 +99,6 @@ def getFollowingIDs(filename, username):
       user = next(users)
     except StopIteration:
       break
-    print(str(user))
     # check if we already have the person in our list
     if str(user) not in ids:
       helper.writeToFile(filename, [str(user),True])
@@ -196,24 +199,30 @@ def followAndHello(filename, myUsername):
   following = helper.readCol('./data/following.csv', 'id')
   blacklist = helper.readCol('./data/blacklist.csv', 'id')
   sentFollow = helper.readCol('./data/sentFollow.csv', 'id')
-  for i in idList:
-    if i not in following and i not in blacklist:
-      final_target_ids.append(i)
-  for j in final_target_ids:
-    # follow these people
-    if j not in sentFollow:
-      followUser(j)
-      helper.writeToFile('./data/sentFollow.csv', [j, date.today().strftime("%m/%d/%y")])
-      # send direct message to these people
-      sendDirectMessage(j, "Hello")
+  if len(idList) > 0:
+    for i in idList:
+      if i not in following and i not in blacklist:
+        final_target_ids.append(i)
+    for j in final_target_ids:
+      # follow these people
+      if j not in sentFollow:
+        followUser(j)
+        d = helper.convertDate_to_days(date.today().strftime("%m/%d/%y"))
+        print(d)
+        helper.writeToFile('./data/sentFollow.csv', [j, d])
+        # send direct message to these people
+        sendDirectMessage(j, "Hello")
   # the limit is 50 people/15 min
-  getFollowingIDs(filename, myUsername)
   # clear the people.csv file
   helper.clearFile('./data/people.csv', ['id', 'name', 'username', 'location', 'description', 'followers_count', 'friends_count', 'listed_count', 'date_joined', 'favourites_count', 'time_zone', 'verified', 'statuses_count', 'language', 'current_following', 'follow_request_sent'])
 
 def check():
-  pass
+  # pull the account followers to file
+  getFollowerIDs('./data/follower.csv', 'chen_haifan')
+  # filter out all the people in the `sentFollow.csv` that have past the time LIMIT(7 days)
 
+    
 
-# followAndHello('./data/following.csv', 'chen_haifan')
-getFollowerIDs('./data/follower.csv', 'chen_haifan')
+followAndHello('./data/following.csv', 'chen_haifan')
+# print(helper.convertDate_to_days('1/31/22'))
+      

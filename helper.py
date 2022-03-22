@@ -48,3 +48,7 @@ def readCol(filename, colName):
     id.append(col[colName])
 
   return id
+
+def convertDate_to_days(date):
+  if(len(date.split('/')) > 1):
+      return int(date.split('/')[0])*30+int(date.split('/')[1])
