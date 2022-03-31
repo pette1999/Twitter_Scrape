@@ -37,7 +37,7 @@ def getUserInfo(username):
 
 def getTweets(tag):
   api = getAPIV1()
-  tweet_cursor = tweepy.Cursor(api.search_tweets, q=tag, lang="en", tweet_mode="extended").items(100)
+  tweet_cursor = tweepy.Cursor(api.search_tweets, q=tag, lang="en", tweet_mode="extended").items(30)
   # tweets = [tweet.full_text for tweet in tweet_cursor]
   tweets = [tweet._json for tweet in tweet_cursor]
   return tweets
@@ -190,7 +190,7 @@ def sendDirectMessage(userID, message):
   try:
     api.send_direct_message(recipient_id=userID, text=message, quick_reply_options=options)
   except Exception as e:
-    print(e)
+    print("Doesn't have permission to send direct messages to: ", userID)
 
 def followAndHello(filename, myUsername):
   final_target_ids = []
@@ -208,12 +208,15 @@ def followAndHello(filename, myUsername):
     for j in final_target_ids:
       # follow these people
       if j not in sentFollow:
-        followUser(j)
-        d = helper.convertDate_to_days(date.today().strftime("%m/%d/%y"))
-        print(d)
-        helper.writeToFile('./data/sentFollow.csv', [j, d])
-        # send direct message to these people
-        sendDirectMessage(j, "Hello")
+        print(final_target_ids.index(j))
+        try:
+          followUser(j)
+          d = helper.convertDate_to_days(date.today().strftime("%m/%d/%y"))
+          helper.writeToFile('./data/sentFollow.csv', [j, d])
+          # send direct message to these people
+          sendDirectMessage(j, "Hello")
+        except:
+          continue
   # the limit is 50 people/15 min
   # clear the people.csv file
   helper.clearFile('./data/people.csv', ['id', 'name', 'username', 'location', 'description', 'followers_count', 'friends_count', 'listed_count', 'date_joined', 'favourites_count', 'time_zone', 'verified', 'statuses_count', 'language', 'current_following', 'follow_request_sent'])
@@ -221,17 +224,18 @@ def followAndHello(filename, myUsername):
   getFollowingIDs(filename, myUsername)
 
 def check():
+  toUnfollow = []
   # pull the account followers to file
-  getFollowerIDs('./data/follower.csv', 'chen_haifan')
+  getFollowerIDs('./data/follower.csv', 'PeterCh39124642')
   followerIDs = helper.readCol('./data/follower.csv', 'id')
   # filter out all the people in the `sentFollow.csv` that have past the time LIMIT(7 days)
   filteredIDs = [] # users that needed to be checked if they followed or not
   d = helper.convertDate_to_days(date.today().strftime("%m/%d/%y"))
   sendFollowIDs = helper.readCol('./data/sentFollow.csv', 'id')
   sendFollowDates = helper.readCol('./data/sentFollow.csv', 'date')
-  for i in sendFollowDates:
-    if int(i) < int(d)-7:
-      filteredIDs.append(sendFollowIDs[sendFollowDates.index(i)])
+  for i in range(len(sendFollowDates)):
+    if int(sendFollowDates[i]) < int(d)-1:
+      filteredIDs.append(sendFollowIDs[i])
   # check each id in the filteredIDs list and see if it's in the followerIDs list
   # if yes, then the user followed back, if not, the user didn't follow back and we need to unfollow this user as well
   for j in filteredIDs:
@@ -241,11 +245,15 @@ def check():
     else:
       # the person didn't follow back
       # unfollow this person
-      unFollowUser(j)
+      toUnfollow.append(j)
       helper.deleteLine('./data/following.csv', j)
       helper.writeToFile('./data/blacklist.csv', [j])
 
     helper.deleteLine('./data/sentFollow.csv', j)
+   
+  for people in toUnfollow:
+    unFollowUser(people)
+    print(people, " unfollowed.")
 
 
 # followAndHello('./data/following.csv', 'chen_haifan')
