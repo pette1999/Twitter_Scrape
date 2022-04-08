@@ -42,6 +42,10 @@ def getTweets(tag,mode):
   tweets = [tweet._json for tweet in tweet_cursor]
   return tweets
 
+def reply(reply, tweetID):
+  api = getAPIV1()
+  api.update_status(status=reply, in_reply_to_status_id=tweetID,  auto_populate_reply_metadata=True)
+
 def getFollowers_by_username(username):
   api = getAPIV1()
   users = tweepy.Cursor(
@@ -261,7 +265,11 @@ def replyRecentTweets(topic):
   for i in range(len(tweets)):
     if tweets[i]['user']['followers_count'] > 10000:
       replyList.append(i)
-  print(replyList)
+  for j in replyList:
+    # reply to these tweets
+    # reply("message", tweets[j]['id_str'])
+    print(tweets[j]['id_str'])
+
 # followAndHello('./data/following.csv', 'chen_haifan')
 # print(helper.convertDate_to_days('1/31/22'))
 # check()
