@@ -35,9 +35,9 @@ def getUserInfo(username):
   user2 = api.get_user(screen_name=username)
   return user2._json
 
-def getTweets(tag):
+def getTweets(tag,mode):
   api = getAPIV1()
-  tweet_cursor = tweepy.Cursor(api.search_tweets, q=tag, lang="en", tweet_mode="extended").items(30)
+  tweet_cursor = tweepy.Cursor(api.search_tweets, q=tag, lang="en", result_type=mode, tweet_mode="extended").items(100)
   # tweets = [tweet.full_text for tweet in tweet_cursor]
   tweets = [tweet._json for tweet in tweet_cursor]
   return tweets
@@ -152,7 +152,7 @@ def getOutgoing_friendship(filename):
       helper.writeToFile(filename, [str(user), False])
 
 def getRecentTweeter(topic, filename):
-  people = getTweets(topic)
+  people = getTweets(topic, 'recent')
   for i in range(len(people)):
     person = people[i]['user']
     data = [person['id'], person['name'],
@@ -255,7 +255,14 @@ def check():
     unFollowUser(people)
     print(people, " unfollowed.")
 
-
+def replyRecentTweets(topic):
+  replyList = []
+  tweets = getTweets(topic, 'recent')
+  for i in range(len(tweets)):
+    if tweets[i]['user']['followers_count'] > 10000:
+      replyList.append(i)
+  print(replyList)
 # followAndHello('./data/following.csv', 'chen_haifan')
 # print(helper.convertDate_to_days('1/31/22'))
 # check()
+replyRecentTweets('drop%20your%20nft')
