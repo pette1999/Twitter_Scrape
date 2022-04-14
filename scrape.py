@@ -262,6 +262,7 @@ def check():
 def replyRecentTweets(topic):
   replyList = []
   tweets = getTweets(topic, 'recent')
+  print(tweets)
   for i in range(len(tweets)):
     if tweets[i]['user']['followers_count'] > 10000:
       replyList.append(i)
