@@ -47,6 +47,7 @@ def getTweets(tag,mode):
 def reply(reply, tweetID):
   api = getAPIV1()
   api.update_status(status=reply, in_reply_to_status_id=tweetID,  auto_populate_reply_metadata=True)
+  print("replied")
 
 def getFollowers_by_username(username):
   api = getAPIV1()
@@ -263,6 +264,7 @@ def check():
 
 def replyRecentTweets(topic):
   message = "🌟 Please checkout our new generative art Spectrum by @LibertasART"
+  replied = helper.readCol('./data/replied.csv', 'id')
   replyList = []
   tweets = getTweets(topic, 'recent')
   logging.basicConfig(filename="./data/log.log",level=logging.DEBUG,format='%(asctime)s %(message)s', datefmt='%m/%d/%Y %H:%M:%S')
@@ -272,13 +274,14 @@ def replyRecentTweets(topic):
       replyList.append(i)
   for j in replyList:
     # reply to these tweets
-    reply(message, tweets[j]['id_str'])
-    logging.info('replied to this id:'+ str(tweets[j]['id_str']))
-    print(tweets[j]['id_str'])
-  print(replyList)
+    if(tweets[j]['id_str'] not in replied):
+      reply(message, tweets[j]['id_str'])
+      logging.info('replied to this id:'+ str(tweets[j]['id_str']))
+      helper.writeToFile('./data/replied.csv', [str(tweets[j]['id_str'])])
+      print(tweets[j]['id_str'])
 
 
 # followAndHello('./data/following.csv', 'chen_haifan')
 # print(helper.convertDate_to_days('1/31/22'))
 # check()
-# replyRecentTweets('drop%20your%20nft')
+replyRecentTweets('drop%20your%20nft')

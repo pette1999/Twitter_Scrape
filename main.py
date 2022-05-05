@@ -1,6 +1,7 @@
 import scrape
 from tqdm import tqdm
 import random
+import time
 
 def main():
   while True:
