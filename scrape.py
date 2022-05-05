@@ -6,6 +6,7 @@ import helper
 import time
 from datetime import date
 import datetime
+import logging
 
 bearer_token = config('bearerToken',default='')
 consumer_key = config('consumer_key',default='')
@@ -261,9 +262,10 @@ def check():
     print(people, " unfollowed.")
 
 def replyRecentTweets(topic):
-  message = "🌟 Please checkout this new generative art Spectrum by @LibertasART, if you like it you can have one on opensea 👉🏼 https://opensea.io/collection/libertasart"
+  message = "🌟 Please checkout our new generative art Spectrum by @LibertasART"
   replyList = []
   tweets = getTweets(topic, 'recent')
+  logging.basicConfig(filename="./data/log.log",level=logging.DEBUG,format='%(asctime)s %(message)s', datefmt='%m/%d/%Y %H:%M:%S')
   # print(tweets)
   for i in range(len(tweets)):
     if tweets[i]['user']['followers_count'] > 10000:
@@ -271,8 +273,9 @@ def replyRecentTweets(topic):
   for j in replyList:
     # reply to these tweets
     reply(message, tweets[j]['id_str'])
-    helper.writeToFile('./data/replyLog.csv',[datetime.datetime.now(), "replied to this id: " + str(tweets[j]['id_str'])])
+    logging.info('replied to this id:'+ str(tweets[j]['id_str']))
     print(tweets[j]['id_str'])
+  print(replyList)
 
 
 # followAndHello('./data/following.csv', 'chen_haifan')

@@ -1,17 +1,12 @@
 import scrape
+from tqdm import tqdm
+import random
 
 def main():
-  # count = 0
-  # while True:
-  #   scrape.getRecentTweeter('nft','./data/people.csv')
-  #   scrape.followAndHello('./data/following.csv', 'PeterCh39124642')
-  #   scrape.time.sleep(1800)
-  #   count += 1
-  #   if count % 48 == 0:
-  #     scrape.check()
   while True:
+    sleepTime = random.randrange(1800, 3600, 30)
     scrape.replyRecentTweets('drop%20your%20nft')
-    time.sleep(1800)
+    for i in tqdm(range(sleepTime), desc="Waiting time: "):
+      time.sleep(1)
 
 main()
- 
