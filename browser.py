@@ -12,7 +12,7 @@ options = webdriver.ChromeOptions()
 options.add_argument('--disable-blink-features=AutomationControlled')
 options.add_experimental_option("excludeSwitches", ["enable-automation"])
 options.add_experimental_option('useAutomationExtension', False)
-# options.add_argument("--headless")
+options.add_argument("--headless")
 options.add_argument("--incognito")
 driver = webdriver.Chrome(options=options)
 driver.execute_script(
