@@ -56,15 +56,22 @@ def reply(replyText):
   login(driver)
   for i in gotUrls:
     if(i not in replied):
-      driver.get(i)
-      driver.execute_script("window.scrollTo(0, Math.ceil(document.body.scrollHeight/5));")
-      time.sleep(5)
-      driver.get_screenshot_as_file("screenshot.png")
-      driver.find_element(By.XPATH, '//*[@id="react-root"]/div/div/div[2]/main/div/div/div/div/div/section/div/div/div[1]/div/div[2]/div/div[2]/div[1]/div/div/div/div[2]/div[1]/div/div/div/div/div[1]/div/div/div/div/label/div[1]/div/div/div/div/div[2]/div/div/div/div').send_keys(replyText)
-      driver.find_element(By.XPATH, '//*[@id="react-root"]/div/div/div[2]/main/div/div/div/div/div/section/div/div/div[1]/div/div[2]/div/div[2]/div[2]/div/div/div/div[2]/div[3]/div/div/div[2]/div[2]').click()
-      helper.writeToFile('./data/replied.csv', [i])
-      logging.info('replied to this tweet:' + str(i))
-      print('replied to this tweet:' + str(i))
-      # for each reply, we wait 1 minute
-      time.sleep(60)
+      try:
+        driver.get(i)
+        driver.execute_script("window.scrollTo(0, Math.ceil(document.body.scrollHeight/5));")
+        time.sleep(5)
+        driver.get_screenshot_as_file("screenshot.png")
+        driver.find_element(By.XPATH, '//*[@id="react-root"]/div/div/div[2]/main/div/div/div/div/div/section/div/div/div[1]/div/div[2]/div/div[2]/div[1]/div/div/div/div[2]/div[1]/div/div/div/div/div[1]/div/div/div/div/label/div[1]/div/div/div/div/div[2]/div/div/div/div').send_keys(replyText)
+        driver.find_element(By.XPATH, '//*[@id="react-root"]/div/div/div[2]/main/div/div/div/div/div/section/div/div/div[1]/div/div[2]/div/div[2]/div[2]/div/div/div/div[2]/div[3]/div/div/div[2]/div[2]').click()
+        helper.writeToFile('./data/replied.csv', [i])
+        logging.info('replied to this tweet:' + str(i))
+        print('replied to this tweet:' + str(i))
+        # for each reply, we wait 1 minute
+        time.sleep(60)
+      except:
+        helper.writeToFile('./data/replied.csv', [i])
+        logging.info('Failed to reply to: ' + str(i))
+        print('Failed to reply to: ' + str(i))
+        time.sleep(60)
+        continue
   driver.close()
