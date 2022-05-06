@@ -14,7 +14,7 @@ options.add_experimental_option("excludeSwitches", ["enable-automation"])
 options.add_experimental_option('useAutomationExtension', False)
 # options.add_argument("--headless")
 options.add_argument("--incognito")
-driver = webdriver.Chrome(options=options, executable_path='./chromedriver')
+driver = webdriver.Chrome(options=options, executable_path='/chromedriver')
 driver.execute_script(
     "Object.defineProperty(navigator, 'webdriver', {get: () => undefined})")
   
