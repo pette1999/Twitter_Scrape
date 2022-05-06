@@ -263,11 +263,11 @@ def check():
     print(people, " unfollowed.")
 
 def replyRecentTweets(topic):
-  message = "🌟 Please checkout our new generative art Spectrum by @LibertasART"
+  message = "🌟 Please checkout our new generative art Spectrum by @LibertasART, if you like it you can have one on opensea 👉🏼 https://opensea.io/collection/libertasart"
   replied = helper.readCol('./data/replied.csv', 'id')
   replyList = []
   tweets = getTweets(topic, 'recent')
-  logging.basicConfig(filename="./data/log.log",level=logging.DEBUG,format='%(asctime)s %(message)s', datefmt='%m/%d/%Y %H:%M:%S')
+  logging.basicConfig(filename="./data/log.log",level=logging.NOTSET,format='%(asctime)s %(message)s', datefmt='%m/%d/%Y %H:%M:%S')
   # print(tweets)
   for i in range(len(tweets)):
     if tweets[i]['user']['followers_count'] > 10000:
@@ -284,4 +284,20 @@ def replyRecentTweets(topic):
 # followAndHello('./data/following.csv', 'chen_haifan')
 # print(helper.convertDate_to_days('1/31/22'))
 # check()
-replyRecentTweets('drop%20your%20nft')
+def getTargetTweets(topic):
+  tweets = getTweets(topic, 'recent')
+  gotUrls = helper.readCol('./data/tweetUrl.csv', 'url')
+  replied = helper.readCol('./data/replied.csv', 'id')
+  for i in range(len(tweets)):
+    if tweets[i]['user']['followers_count'] > 10000:
+      print("Screen Name: ", tweets[i]['user']['screen_name'])
+      print("ID: ", tweets[i]['id_str'])
+      url = "https://twitter.com/"+tweets[i]['user']['screen_name']+"/status/"+tweets[i]['id_str']
+      print("URL: ", url.strip())
+      
+      # check if this url already got
+      if(url.strip() not in gotUrls and url.strip() not in replied):
+        helper.writeToFile('./data/tweetUrl.csv', [url.strip()])
+
+
+getTargetTweets('drop%20your%20nft')
