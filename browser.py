@@ -59,6 +59,7 @@ def reply(replyText):
       driver.get(i)
       driver.execute_script("window.scrollTo(0, Math.ceil(document.body.scrollHeight/5));")
       time.sleep(5)
+      driver.get_screenshot_as_file("screenshot.png")
       driver.find_element(By.XPATH, '//*[@id="react-root"]/div/div/div[2]/main/div/div/div/div/div/section/div/div/div[1]/div/div[2]/div/div[2]/div[1]/div/div/div/div[2]/div[1]/div/div/div/div/div[1]/div/div/div/div/label/div[1]/div/div/div/div/div[2]/div/div/div/div').send_keys(replyText)
       driver.find_element(By.XPATH, '//*[@id="react-root"]/div/div/div[2]/main/div/div/div/div/div/section/div/div/div[1]/div/div[2]/div/div[2]/div[2]/div/div/div/div[2]/div[3]/div/div/div[2]/div[2]').click()
       helper.writeToFile('./data/replied.csv', [i])
