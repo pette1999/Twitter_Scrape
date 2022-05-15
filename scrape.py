@@ -44,6 +44,26 @@ def getTweets(tag,mode):
   tweets = [tweet._json for tweet in tweet_cursor]
   return tweets
 
+def searchRecentTweets(tag):
+  user_ids = []
+  tweet_ids = []
+  client = getClientV2()
+  tweets = client.search_recent_tweets(query=tag, max_results=100, tweet_fields=["public_metrics", "author_id"], expansions=['author_id'], user_fields=['public_metrics'])
+  # users = tweets.includes['users']
+  # for j in users:
+  #   print(j['public_metrics'])
+  for i in tweets.data:
+    # print("Author id:", i['author_id'], ", Tweet id:", i['id'])
+    user_ids.append(i['author_id'])
+    tweet_ids.append(i['id'])
+  
+  return user_ids, tweet_ids
+
+def getTweetDetails(id):
+  client = getClientV2()
+  detail = client.get_tweet(id, tweet_fields=["public_metrics"])
+  print(detail)
+
 def reply(reply, tweetID):
   api = getAPIV1()
   api.update_status(status=reply, in_reply_to_status_id=tweetID,  auto_populate_reply_metadata=True)
@@ -285,7 +305,8 @@ def replyRecentTweets(topic):
 # print(helper.convertDate_to_days('1/31/22'))
 # check()
 def getTargetTweets(topic):
-  tweets = getTweets(topic, 'recent')
+  # tweets = getTweets(topic, 'recent')
+  tweets = searchRecentTweets(topic)
   gotUrls = helper.readCol('./data/tweetUrl.csv', 'url')
   replied = helper.readCol('./data/replied.csv', 'id')
   for i in range(len(tweets)):
@@ -300,4 +321,25 @@ def getTargetTweets(topic):
         helper.writeToFile('./data/tweetUrl.csv', [url.strip()])
 
 
-getTargetTweets('drop%20your%20nft')
+def getUsersInfo_over10000followers(ids, tweetIDs):
+  client = getClientV2()
+  infos = client.get_users(ids=ids, user_fields=['public_metrics', 'username'])
+  gotUrls = helper.readCol('./data/tweetUrl.csv', 'url')
+  replied = helper.readCol('./data/replied.csv', 'id')
+  for i in range(len(infos.data)):
+    if(infos.data[i]['public_metrics']['followers_count'] >= 10000):
+      print("Username: ", infos.data[i]['username'])
+      print(tweetIDs[i])
+      url = "https://twitter.com/"+infos.data[i]['username']+"/status/"+str(tweetIDs[i])
+      print("URL: ", url.strip())
+
+      # check if this url already got
+      if(url.strip() not in gotUrls and url.strip() not in replied):
+        helper.writeToFile('./data/tweetUrl.csv', [url.strip()])
+
+# getTargetTweets('drop%20your%20nft')
+# print(getClientV2())
+# getTweetDetails(1525644413732536323)
+# print(searchRecentTweets("Drop your NFT")[0])
+getUsersInfo_over10000followers(searchRecentTweets("Drop your NFT")[0], searchRecentTweets("Drop your NFT")[1])
+# print(searchRecentTweets("Drop your NFT")[0])

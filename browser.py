@@ -7,16 +7,20 @@ import time
 from os.path import exists
 import logging
 import helper
+from fake_useragent import UserAgent
+
+ua = UserAgent()
+userAgent = ua.random
 
 options = webdriver.ChromeOptions()
 options.add_argument('--disable-blink-features=AutomationControlled')
-options.add_argument('user-agent="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/73.0.3683.75 Safari/537.36"')
+options.add_argument('user-agent={userAgent}')
 options.add_argument("--window-size=1920,1080")
 options.add_argument('--ignore-certificate-errors')
 options.add_argument('--allow-running-insecure-content')
 options.add_experimental_option("excludeSwitches", ["enable-automation"])
 options.add_experimental_option('useAutomationExtension', False)
-options.add_argument("--headless")
+# options.add_argument("--headless")
 options.add_argument("--incognito")
 driver = webdriver.Chrome(options=options)
 driver.execute_script(
@@ -75,3 +79,5 @@ def reply(replyText):
         time.sleep(60)
         continue
   driver.close()
+
+reply("Please checkout our new generative art Spectrum by @LibertasART, if you like it you can have one on opensea: https://opensea.io/collection/libertasart")
