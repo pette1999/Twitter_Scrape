@@ -79,5 +79,3 @@ def reply(replyText):
         time.sleep(60)
         continue
   driver.close()
-
-reply("Please checkout our new generative art Spectrum by @LibertasART, if you like it you can have one on opensea: https://opensea.io/collection/libertasart")

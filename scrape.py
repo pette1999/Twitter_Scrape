@@ -341,5 +341,5 @@ def getUsersInfo_over10000followers(ids, tweetIDs):
 # print(getClientV2())
 # getTweetDetails(1525644413732536323)
 # print(searchRecentTweets("Drop your NFT")[0])
-getUsersInfo_over10000followers(searchRecentTweets("Drop your NFT")[0], searchRecentTweets("Drop your NFT")[1])
+# getUsersInfo_over10000followers(searchRecentTweets("Drop your NFT")[0], searchRecentTweets("Drop your NFT")[1])
 # print(searchRecentTweets("Drop your NFT")[0])
