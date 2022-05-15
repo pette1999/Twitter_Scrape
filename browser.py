@@ -20,7 +20,7 @@ options.add_argument('--ignore-certificate-errors')
 options.add_argument('--allow-running-insecure-content')
 options.add_experimental_option("excludeSwitches", ["enable-automation"])
 options.add_experimental_option('useAutomationExtension', False)
-# options.add_argument("--headless")
+options.add_argument("--headless")
 options.add_argument("--incognito")
 driver = webdriver.Chrome(options=options)
 driver.execute_script(

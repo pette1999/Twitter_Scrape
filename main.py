@@ -24,7 +24,7 @@ def main():
   while True:
     sleepTime = random.randrange(1800, 3600, 30)
     messageNum = random.randrange(0,14,1)
-    scrape.getTargetTweets('drop%20your%20nft')
+    scrape.getUsersInfo_over10000followers(scrape.searchRecentTweets("Drop your NFT")[0], scrape.searchRecentTweets("Drop your NFT")[1])
     browser.reply(message[messageNum])
     for i in tqdm(range(sleepTime), desc="Waiting time: "):
       time.sleep(1)
